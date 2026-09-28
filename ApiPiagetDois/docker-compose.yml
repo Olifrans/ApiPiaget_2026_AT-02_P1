@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # Banco de Dados SQL Server
+  sqldb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SenhaForte123! # Defina uma senha forte aqui
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql # Persiste os dados mesmo se o container cair
+
+  # Sua API .NET
+  api:
+    build:
+      context: .
+      dockerfile: ApiPiagetDois/Dockerfile # Ajuste o caminho se o Dockerfile estiver em outro lugar
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ApiPiagetDoisContext=Server=sqldb;Database=DevPiagetAPI;User Id=sa;Password=SenhaForte123!;TrustServerCertificate=True;MultipleActiveResultSets=true
+    depends_on:
+      - sqldb
+
+volumes:
+  sql_data:

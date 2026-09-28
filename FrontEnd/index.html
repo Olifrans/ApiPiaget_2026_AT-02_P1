@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Piaget - Gestão Escolar</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>ERP Piaget</span>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-chart-pie"></i><span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-view="escolas">
+                    <i class="fas fa-school"></i><span>Escolas</span>
+                </button>
+                <button class="nav-item" data-view="alunos">
+                    <i class="fas fa-user-graduate"></i><span>Alunos</span>
+                </button>
+                <button class="nav-item" data-view="professores">
+                    <i class="fas fa-chalkboard-teacher"></i><span>Professores</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <small>v1.0.0 &copy; 2026</small>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 id="pageTitle">📊 Dashboard</h1>
+                    <p id="pageSubtitle" class="text-secondary">Visão geral do sistema</p>
+                </div>
+                <div class="header-actions">
+                    <button id="btnRefresh" class="btn-secondary" title="Atualizar dados">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button id="btnAdd" class="btn-primary">
+                        <i class="fas fa-plus"></i> Novo Registro
+                    </button>
+                </div>
+            </header>
+
+            <!-- Search & Filter (Oculto no Dashboard) -->
+            <div class="search-bar" id="searchBar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nome, email, matrícula...">
+                </div>
+            </div>
+
+            <!-- Statistics Cards (Sempre visível, mas atualiza conforme contexto) -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-school"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statEscolas">0</h3>
+                        <p>Escolas Ativas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-user-graduate"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statAlunos">0</h3>
+                        <p>Total de Alunos</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statProfessores">0</h3>
+                        <p>Total de Professores</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Table Container -->
+            <section class="table-container">
+                <div class="table-wrapper">
+                    <table id="dataTable">
+                        <thead id="tableHead">
+                            <!-- Preenchido via JS -->
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                    <i class="fas fa-circle-notch fa-spin"></i> Carregando dados do sistema...
+                </div>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <p>Nenhum registro encontrado.</p>
+                </div>
+            </section>
+
+            <!-- Pagination -->
+            <div class="pagination" id="paginationControls">
+                <button id="prevPage" class="btn-page"><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo">Página 1 de 1</span>
+                <button id="nextPage" class="btn-page"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Dynamic Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Novo Registro</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="formModal">
+                <input type="hidden" id="formId">
+                <input type="hidden" id="formType">
+                
+                <!-- Campos Dinâmicos -->
+                <div class="form-group" data-entities="escola,aluno,professor">
+                    <label for="formNome">Nome <span class="required">*</span></label>
+                    <input type="text" id="formNome" required>
+                </div>
+
+                <div class="form-group" data-entities="aluno">
+                    <label for="formMatricula">Matrícula <span class="required">*</span></label>
+                    <input type="text" id="formMatricula" required>
+                </div>
+
+                <div class="form-group" data-entities="professor">
+                    <label for="formDisciplina">Disciplina <span class="required">*</span></label>
+                    <input type="text" id="formDisciplina" required>
+                </div>
+
+                <div class="form-group" data-entities="escola,aluno,professor">
+                    <label for="formEmail">E-mail <span class="required">*</span></label>
+                    <input type="email" id="formEmail" required>
+                </div>
+
+                <div class="form-group" data-entities="escola,aluno,professor">
+                    <label for="formTelefone">Telefone <span class="required">*</span></label>
+                    <input type="text" id="formTelefone" required>
+                </div>
+
+                <div class="form-group" data-entities="escola">
+                    <label for="formEndereco">Endereço</label>
+                    <input type="text" id="formEndereco">
+                </div>
+
+                <div class="form-group" data-entities="aluno,professor">
+                    <label for="formEscolaId">Escola Vinculada <span class="required">*</span></label>
+                    <select id="formEscolaId" required>
+                        <option value="">Selecione uma escola...</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btnSave">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
